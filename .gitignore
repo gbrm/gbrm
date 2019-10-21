@@ -1,0 +1,12 @@
+# Ignored files and directories #
+#################################
+
+.env
+dep
+vendor/
+env/
+.idea/
+Dockerfile
+docker-compose.yml
+.drone.yml
+go.sum
