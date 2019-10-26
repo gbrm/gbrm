@@ -1,0 +1,11 @@
+{{define "content"}}
+    <span class="title">Confirm Your Email</span>
+    <div class="uk-margin">
+        <label class="uk-form-label" for="auth_code">Auth Code</label>
+        <input class="uk-input" id="auth_code" name="auth_code" type="number" aria-valuemax="999999">
+        <input id="email" name="email" hidden>
+    </div>
+    <div class="uk-margin">
+        <button class="uk-button uk-button-primary uk-width">Confirm</button>
+    </div>
+{{end}}

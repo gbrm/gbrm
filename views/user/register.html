@@ -1,0 +1,21 @@
+{{define "content"}}
+    <span class="title">Start Your Journey</span>
+    <div class="uk-margin">
+        <label class="uk-form-label" for="email">Email</label>
+        <input class="uk-input" id="email" name="email" value="{{.email}}">
+    </div>
+    <div class="uk-margin">
+        <label class="uk-form-label" for="password">Password</label>
+        <input class="uk-input" id="password" name="password">
+    </div>
+    <div class="uk-margin">
+        <label class="uk-form-label" for="password">Confirm Your Password</label>
+        <input class="uk-input" id="confirm_password" name="confirm_password">
+    </div>
+    <div class="uk-margin">
+        <button class="uk-button uk-button-primary uk-width">Register</button>
+        <a class="uk-button uk-button-secondary uk-width" href="/login">
+            Have an Account
+        </a>
+    </div>
+{{end}}

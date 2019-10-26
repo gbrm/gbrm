@@ -1,0 +1,44 @@
+{{template "header"}}
+<script>
+    function print_message(enclose) {
+        if ("{{ .message }}") {
+            document.write(enclose.replace("@content@", "{{ .message }}"))
+        }
+    }
+    window.onload = ()=>{
+        if ("{{ .email }}") {
+            document.getElementById("email").value = "{{ .email }}"
+        }
+    }
+</script>
+<body>
+    <form class="uk-card uk-card-default uk-card-body uk-width-1-3 modal" method="post">
+        <script>print_message(`
+            <div class="uk-alert-primary" uk-alert>
+                <a class="uk-alert-close" uk-close></a>
+                <p>@content@</p>
+            </div>
+        `)</script>
+        {{template "content"}}
+    </form>
+    <img data-src="https://pbs.twimg.com/media/CKw5jt5WsAA7thr.jpg"
+         width="100%" height="100%" alt="" uk-img class="background">
+    </body>
+    <style>
+        .background{
+            z-index: -100;
+            position: absolute;
+            top: 0;
+        }
+        .title{
+            font-size: 30px;
+            font-weight: 500;
+        }
+        .modal{
+            margin: 10% auto;
+            max-width: 500px;
+            min-width: 400px;
+        }
+
+    </style>
+{{template "footer"}}

@@ -1,0 +1,22 @@
+{{define "content"}}
+    <h1>Mates</h1>
+    <button class="uk-button uk-button-secondary uk-width">Add New Mate</button>
+    <div id="main" class="uk-margin uk-child-width-1-2@s uk-grid-match" uk-grid></div>
+    <script>
+        window.onload = ()=>{
+            let html = "";
+            data.forEach((res) => {
+                html += `
+                <div>
+                    <div class="uk-card uk-card-default uk-card-hover uk-card-body">
+                        <h3 class="uk-card-title">${res.Name}</h3>
+                        <p>${res.Description}</p>
+                    </div>
+                </div>
+                `
+            });
+            document.getElementById("main").innerHTML = html
+        }
+
+    </script>
+{{end}}
