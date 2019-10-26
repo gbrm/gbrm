@@ -1,19 +1,21 @@
 package mail
 
 import (
-	"github.com/shouc/gbrm/config"
+	"fmt"
 	"github.com/go-gomail/gomail"
+	"github.com/shouc/gbrm/config"
 	"io/ioutil"
 	"log"
 	"strconv"
 	"strings"
 	"time"
 )
+
 var MAIN_HTML string
 var AUTH_HTML string
 var CHANNEL = make(chan *gomail.Message)
 
-func init(){
+func init() {
 	mainHtml, _ := ioutil.ReadFile("external/main.html")
 	authHtml, _ := ioutil.ReadFile("external/authCode.html")
 	MAIN_HTML = string(MAIN_HTML)
@@ -57,21 +59,21 @@ func init(){
 	}()
 }
 
-func SendAuthCode(authCode int, email string){
+func SendAuthCode(authCode int, email string) {
 	authCodeStr := strconv.Itoa(authCode)
 	content := strings.Replace(AUTH_HTML, "/@AUTHCODE@/", authCodeStr, 1)
 	m := gomail.NewMessage()
-	m.SetHeader("From", "GBRM <intl@gbrm.io>")
-	m.SetHeader("To", email)
+	m.SetHeader("From", "GBRM <intl@u.zwang.tech>")
+	m.SetHeader("To", fmt.Sprintf("Custormer <%s>", email))
 	m.SetHeader("Subject", "Your Auth Code Arrived!")
 	m.SetBody("text/html", content)
 	CHANNEL <- m
 }
 
-func SendNotification(title string, r string, emails []string){
+func SendNotification(title string, r string, emails []string) {
 	content := strings.Replace(MAIN_HTML, "/@CONTENT@/", r, 1)
 	m := gomail.NewMessage()
-	m.SetHeader("From", "GBRM <intl@gbrm.io>")
+	m.SetHeader("From", "GBRM <intl@u.zwang.tech>")
 	m.SetHeader("To", emails...)
 	m.SetHeader("Subject", title)
 	m.SetBody("text/html", content)

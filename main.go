@@ -2,19 +2,37 @@ package main
 
 import (
 	"fmt"
-	"github.com/shouc/gbrm/config"
-	"github.com/shouc/gbrm/controller/file"
-	"github.com/shouc/gbrm/controller/message"
-	"github.com/shouc/gbrm/controller/pay"
-	"github.com/shouc/gbrm/controller/user"
-	"github.com/shouc/gbrm/controller/user_admin"
-	"github.com/shouc/gbrm/database"
-	"github.com/shouc/gbrm/lib/middleware"
-
 	"github.com/getsentry/sentry-go/gin"
+	"github.com/gin-contrib/multitemplate"
 	"github.com/gin-gonic/gin"
+	"github.com/shouc/gbrm/config"
+	"github.com/shouc/gbrm/controller/index"
+	"github.com/shouc/gbrm/controller/panel"
+	"github.com/shouc/gbrm/controller/user"
+	"github.com/shouc/gbrm/database"
+	"github.com/shouc/gbrm/database/model"
+	"github.com/shouc/gbrm/lib/middleware"
 	"os"
 )
+
+func createMyRender() multitemplate.Renderer {
+	r := multitemplate.NewRenderer()
+	layouts := []string{
+		"views/layout/header.html",
+		"views/layout/footer.html",
+	}
+	r.AddFromFiles("index", "views/index.html", layouts[0], layouts[1])
+	r.AddFromFiles("login", "views/user/user_base.html", "views/user/login.html", layouts[0], layouts[1])
+	r.AddFromFiles("register", "views/user/user_base.html", "views/user/register.html", layouts[0], layouts[1])
+	r.AddFromFiles("confirm", "views/user/user_base.html", "views/user/confirm.html", layouts[0], layouts[1])
+
+	r.AddFromFiles("home", "views/panel/panel_base.html", "views/panel/home.html", layouts[0], layouts[1])
+	r.AddFromFiles("mate", "views/panel/panel_base.html", "views/panel/mate.html", layouts[0], layouts[1])
+	r.AddFromFiles("story", "views/panel/panel_base.html", "views/panel/story.html", layouts[0], layouts[1])
+	r.AddFromFiles("petition", "views/panel/panel_base.html", "views/panel/petition.html", layouts[0], layouts[1])
+
+	return r
+}
 
 func main() {
 
@@ -23,29 +41,41 @@ func main() {
 	redis := database.GetRedis()
 	defer db.Close()
 	defer redis.Close()
+	db.CreateTable(&model.Mates{})
+	db.CreateTable(&model.Users{})
+	db.CreateTable(&model.Messages{})
+	db.CreateTable(&model.Petitions{})
+	db.CreateTable(&model.Tags{})
 
 	fmt.Println(os.Getenv("stage"))
 	router := gin.Default()
 	router.Use(sentrygin.New(sentrygin.Options{}))
 	router.Use(middleware.CORS())
-	router.GET("/", func(c *gin.Context) {
-		c.String(200, "Stage: " + os.Getenv("stage"))
-	})
+
 	v2 := router.Group("/v2/")
 
 	v2.Use(middleware.GBRM())
 	userRoute := v2.Group("user")
 	{
-		userRoute.POST("login", user.UserLogin)
 		userRoute.GET("info", user.UserInfo)
-		userRoute.POST("register", user.UserRegister)
-		userRoute.POST("confirm", user.UserConfirm)
 	}
-	messageRouteAuth := v2.Group("message")
-	messageRouteAuth.Use(middleware.Auth())
-	{
-		messageRouteAuth.GET("unread", message.UnreadMessages)
-		messageRouteAuth.GET("read", message.ReadMessages)
-	}
+
+	router.HTMLRender = createMyRender()
+	//router.LoadHTMLFiles("templates/template1.html", "templates/template2.html")
+	router.GET("login", user.GetLogin)
+	router.GET("register", user.GetRegister)
+	router.GET("confirm", user.GetConfirm)
+
+	router.POST("login", user.PostLogin)
+	router.POST("register", user.PostRegister)
+	router.POST("confirm", user.PostConfirm)
+
+	router.GET("", index.GetIndex)
+
+	router.GET("home", panel.GetHome)
+	router.GET("mate", panel.GetMate)
+	router.GET("story", panel.GetStory)
+	router.GET("petition", panel.GetPetition)
+
 	_ = router.Run(":" + config.SERVER_PORT)
 }
